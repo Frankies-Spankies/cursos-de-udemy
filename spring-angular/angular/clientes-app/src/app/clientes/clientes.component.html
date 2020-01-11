@@ -5,13 +5,19 @@
         <div class="my-2 text-left">
             <button class="btn btn-primary" type="button" [routerLink]="['/clientes/form']">Agrega Cliente</button>
         </div>
-        <table class="table table-dark">
+
+        <div *ngIf="clientes?.length === 0" class="alert alert-info">
+            ¡No hay clientes registrados!
+        </div>
+        <table class="table table-dark" *ngIf="clientes?.length>0">
             <thead>
                 <th>id</th>
                 <th>nombre</th>
                 <th>apellido</th>
                 <th>email</th>
                 <th>fecha</th>
+                <th>editar</th>
+                <th>eliminan</th>
             </thead>
             <tbody>
                 <tr *ngFor="let cliente of clientes">
@@ -19,7 +25,9 @@
                     <th>{{ cliente.nombre}}</th>
                     <th>{{ cliente.apellido}}</th>
                     <th>{{ cliente.email}}</th>
-                    <th>{{ cliente.creteAt}}</th>
+                    <th>{{ cliente.createAt}}</th>
+                    <th><button class="btn btn-primary" [routerLink]="['/clientes/form' , cliente.id]">Editar</button></th>
+                    <th><button class="btn btn-danger" (click)="eliminarCliente(cliente)">Borrar</button></th>
                 </tr>
             </tbody>
         </table>

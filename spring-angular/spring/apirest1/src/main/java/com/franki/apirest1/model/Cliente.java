@@ -12,6 +12,9 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table
@@ -20,12 +23,17 @@ public class Cliente implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+	@NotEmpty
+	@Size(min = 4, max = 8, message = "Debe tener entre 4 y 8 caracteres")
 	private String nombre;
+	@NotEmpty
 	private String apellido;
+	@NotEmpty
+	@Email
+	@Column(unique = true, nullable = false)
 	private String email;
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
-	
 	@PrePersist
 	public void preGuardado() {
 		createAt = new Date();
