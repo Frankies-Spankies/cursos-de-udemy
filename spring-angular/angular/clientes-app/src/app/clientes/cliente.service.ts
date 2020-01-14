@@ -6,6 +6,8 @@ import { map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { formatDate, registerLocaleData } from '@angular/common';
+
 
 
 @Injectable({
@@ -17,15 +19,25 @@ export class ClienteService {
 
   constructor(private http: HttpClient, private router:Router) { }
 
-  getClientes(): Observable<Cliente[]> {
+  getClientes(pages:number): Observable<Cliente[]> {
     //return of(CLIENTES); 
 
-    //Otra forma de catear la respuesta al tipo Cilentes
+    //Otra forma de castear la respuesta al tipo Cilentes
     // return this.http.get(this.url).pipe(
     //   map( response => response as Cliente[])
     // );
 
-    return this.http.get<Cliente[]>(this.url);
+    return this.http.get<Cliente[]>(this.url+'/page/'+pages).pipe(
+      map((resp:any)=>{
+        let clientes = resp.content as Cliente[];
+        clientes.map(cliente=>{
+
+          //cliente.createAt=formatDate(cliente.createAt, 'fullDate','es');
+          return cliente;
+        });
+        return resp;
+      })
+    );
   }
 
 

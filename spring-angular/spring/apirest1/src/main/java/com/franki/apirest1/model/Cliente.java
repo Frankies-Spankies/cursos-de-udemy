@@ -30,7 +30,7 @@ public class Cliente implements Serializable{
 	private String apellido;
 	@NotEmpty
 	@Email
-	@Column(unique = true, nullable = false)
+	@Column(unique = false, nullable = false)
 	private String email;
 	@Temporal(TemporalType.DATE)
 	private Date createAt;

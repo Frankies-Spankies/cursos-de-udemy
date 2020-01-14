@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ClienteService } from './cliente.service';
 import { Cliente } from './cliente';
 import swal from 'sweetalert2'
+import { tap } from 'rxjs/operators';
+import { CLIENTES } from './clientes.json';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -12,25 +15,48 @@ import swal from 'sweetalert2'
 export class ClientesComponent implements OnInit {
 
   clientes: Cliente[];
-  
-  
+  paginador:any;
+
+
   //============EQUIVALENTE DE INYECTAR UN SERVIOCIO============
 
   // constructor( clienteService : ClienteService) { 
   //   this.clienteService=clienteService;
   // }
- 
-  constructor( private clienteService : ClienteService) { 
-  }
+
+  constructor(
+    private clienteService: ClienteService,
+    private activatedRoute: ActivatedRoute
+  ) {}
+
+
+  //==========================
+
+  //Mediante el operador tap unicamente se obtienen los datos de la respuesta, pero no se modifican aun que se modifique en el operador
+  //El operador map si hace un cambio en la rspuesta
+  //El operador pipe sirve para poner varios operadores que reciben funciones cuyo parametro es la respuesta de una peticiion, 
+  //o lo que regrea un observable 
+
+  //==========================
 
   ngOnInit() {
-    this.clienteService.getClientes().subscribe(clientes=>{
-      this.clientes=clientes;
-    });
+    this.activatedRoute.params.subscribe(params=>{
+      //El operador suma caste un String a Number
+      let page:number=params['page'];
+      if (!page) {
+        page = 0;
+      }
+      this.clienteService.getClientes(page).pipe(
+        tap((resp: any) => {
+          this.clientes = resp.content;
+          this.paginador= resp;
+        })
+      ).subscribe();
+    })
   }
 
 
-  eliminarCliente(cliente:Cliente):void{
+  eliminarCliente(cliente: Cliente): void {
     const swalWithBootstrapButtons = swal.mixin({
       customClass: {
         confirmButton: 'btn btn-success',
@@ -38,7 +64,7 @@ export class ClientesComponent implements OnInit {
       },
       buttonsStyling: false
     })
-    
+
     swalWithBootstrapButtons.fire({
       title: 'Estas seguro de eliminar al cliente',
       text: `${cliente.nombre}`,
@@ -49,15 +75,15 @@ export class ClientesComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.value) {
-        this.clienteService.borrarCliente(cliente.id).subscribe(resp=>{
-          this.clientes=this.clientes.filter(cli=>cli!=cliente);
+        this.clienteService.borrarCliente(cliente.id).subscribe(resp => {
+          this.clientes = this.clientes.filter(cli => cli != cliente);
         });
         swalWithBootstrapButtons.fire(
           '¿Eliminado!',
           'Cliente eliminado con exito.',
           'success'
         )
-      } 
+      }
     })
   }
 
