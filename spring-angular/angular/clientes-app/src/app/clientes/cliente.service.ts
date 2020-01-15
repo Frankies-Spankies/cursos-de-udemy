@@ -17,9 +17,9 @@ export class ClienteService {
   private url: string = 'http://localhost:8080/api/clientes';
   private httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
-  constructor(private http: HttpClient, private router:Router) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
-  getClientes(pages:number): Observable<Cliente[]> {
+  getClientes(pages: number): Observable<Cliente[]> {
     //return of(CLIENTES); 
 
     //Otra forma de castear la respuesta al tipo Cilentes
@@ -27,10 +27,10 @@ export class ClienteService {
     //   map( response => response as Cliente[])
     // );
 
-    return this.http.get<Cliente[]>(this.url+'/page/'+pages).pipe(
-      map((resp:any)=>{
+    return this.http.get<Cliente[]>(this.url + '/page/' + pages).pipe(
+      map((resp: any) => {
         let clientes = resp.content as Cliente[];
-        clientes.map(cliente=>{
+        clientes.map(cliente => {
 
           //cliente.createAt=formatDate(cliente.createAt, 'fullDate','es');
           return cliente;
@@ -47,7 +47,7 @@ export class ClienteService {
   crearCliente(cliente: Cliente): Observable<any> {
     return this.http.post<any>(this.url, cliente, { headers: this.httpHeaders }).pipe(
       catchError(e => {
-        if (e.status===400) {
+        if (e.status === 400) {
           return throwError(e);
         }
         console.log(e);
@@ -60,7 +60,7 @@ export class ClienteService {
   getCliente(id: string): Observable<Cliente> {
     return this.http.get<Cliente>(this.url + `/${id}`).pipe(
       catchError(e => {
-        this.router.navigate(['/clientes']); 
+        this.router.navigate(['/clientes']);
         console.log(e);
         swal.fire('Error al obtener cliente :', e.error.mensaje, 'error');
         return throwError(e);
@@ -71,7 +71,7 @@ export class ClienteService {
   actualizaCliente(cliente: Cliente): Observable<Cliente> {
     return this.http.put<Cliente>(this.url + `/${cliente.id}`, cliente, { headers: this.httpHeaders }).pipe(
       catchError(e => {
-        if (e.status===400) {
+        if (e.status === 400) {
           return throwError(e);
         }
         console.log(e);
@@ -90,4 +90,20 @@ export class ClienteService {
       })
     );
   }
-}
+
+  subirArchivo(archivo: File, id): Observable<Cliente> {
+    let formData = new FormData();
+    formData.append("archivo", archivo);
+    formData.append("id", id);
+
+    return this.http.post(this.url + '/upload', formData).pipe(
+      map((resp: any) => resp.cliente as Cliente),
+      catchError(e => {
+        console.log(e);
+        swal.fire('Error al subir la imagen:', e.error.mensaje, 'error');
+        return throwError(e.error.error);
+      })
+    );
+  }
+
+  }

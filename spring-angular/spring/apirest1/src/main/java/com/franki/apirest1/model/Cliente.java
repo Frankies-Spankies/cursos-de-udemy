@@ -14,7 +14,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.Size;
+
+
+//TODOS LOS CONSTRAIS SON DEL PAQUETE CONSTRAINS PARA PODER ENVIAR MENSAJES DE VALIDACION
+
+
 
 @Entity
 @Table
@@ -32,9 +39,17 @@ public class Cliente implements Serializable{
 	@Email
 	@Column(unique = false, nullable = false)
 	private String email;
+	@NotNull(message = "no puede estar vacia la fecha")
 	@Temporal(TemporalType.DATE)
 	private Date createAt;
-	@PrePersist
+	
+	private String imagen;
+	
+	
+
+
+	//NOTACION UTLIZADA PARA HACER QUE ESA FUNCION SE EJECUTE ANTES DE QUE SE ALMACEN EL OBJETO EN LA BASDE DE DATOS
+	//@PrePersist
 	public void preGuardado() {
 		createAt = new Date();
 	}
@@ -68,6 +83,14 @@ public class Cliente implements Serializable{
 	}
 	public void setCreateAt(Date createAt) {
 		this.createAt = createAt;
+	}
+	
+	public String getImagen() {
+		return imagen;
+	}
+
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
 	}
 	
 	/**
