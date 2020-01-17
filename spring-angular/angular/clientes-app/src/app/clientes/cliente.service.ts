@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Cliente } from './cliente';
-import { CLIENTES } from './clientes.json';
+// import { CLIENTES } from './clientes.json';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest, HttpEvent } from '@angular/common/http';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { formatDate, registerLocaleData } from '@angular/common';
+import { Region } from './region';
 
 
 
@@ -16,8 +17,19 @@ import { formatDate, registerLocaleData } from '@angular/common';
 export class ClienteService {
   private url: string = 'http://localhost:8080/api/clientes';
   private httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
+  _notificarUpload=new EventEmitter<any>();
 
+
+
+  get notificarUpload():EventEmitter<any>{
+    return this._notificarUpload;
+  }
   constructor(private http: HttpClient, private router: Router) { }
+
+
+  getRegiones():Observable<Region[]>{
+    return this.http.get<Region[]>(this.url+'/regiones');
+  }
 
   getClientes(pages: number): Observable<Cliente[]> {
     //return of(CLIENTES); 
@@ -91,19 +103,16 @@ export class ClienteService {
     );
   }
 
-  subirArchivo(archivo: File, id): Observable<Cliente> {
+  subirArchivo(archivo: File, id): Observable<HttpEvent<{}>> {
     let formData = new FormData();
     formData.append("archivo", archivo);
     formData.append("id", id);
 
-    return this.http.post(this.url + '/upload', formData).pipe(
-      map((resp: any) => resp.cliente as Cliente),
-      catchError(e => {
-        console.log(e);
-        swal.fire('Error al subir la imagen:', e.error.mensaje, 'error');
-        return throwError(e.error.error);
-      })
-    );
+    const req = new HttpRequest('POST', this.url + '/upload', formData, {
+      reportProgress: true
+    });
+
+    return this.http.request(req);
   }
 
   }

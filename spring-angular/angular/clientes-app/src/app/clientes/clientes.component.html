@@ -1,3 +1,5 @@
+<app-detalle *ngIf="clienteSeleccionado" [cliente]="clienteSeleccionado"></app-detalle>
+
 <div class="card border-primary mb-3">
     <div class="card-header">Clientes</div>
     <div class="card-body text-primary">
@@ -11,7 +13,7 @@
         </div>
         <table class="table table-dark" *ngIf="clientes?.length>0">
             <thead>
-                <th>id</th>
+                <th>#</th>
                 <th>nombre</th>
                 <th>apellido</th>
                 <th>email</th>
@@ -21,11 +23,17 @@
             </thead>
             <tbody>
                 <tr *ngFor="let cliente of clientes">
-                    <th><button class="btn btn-success" [routerLink]="['/clientes/ver' , cliente.id]" > {{ cliente.id}} </button></th>
+                    <th> 
+                        <img *ngIf="cliente?.imagen" src="http://localhost:8080/api/clientes/upload/img/{{cliente.imagen}}"
+                        alt="{{cliente.imagen}}" class="img-thumbnail rounded" (click)="disparaModal(cliente)" style="width: 64px; cursor: pointer;">
+
+                        <img *ngIf="!cliente?.imagen" src="http://localhost:8080/images/desconocido.png"
+                        alt="{{cliente.imagen}}" class="img-thumbnail rounded" (click)="disparaModal(cliente)" style="width: 64px; cursor: pointer;">
+                    </th>
                     <th>{{ cliente.nombre }}</th>
                     <th>{{ cliente.apellido}}</th>
                     <th>{{ cliente.email}}</th>
-                    <th>{{ cliente.createAt | date: "fullDate"}}</th>
+                    <th>{{ cliente.createAt | date: "fullDate"}}</th>  
                     <th><button class="btn btn-primary" [routerLink]="['/clientes/form' , cliente.id]">Editar</button></th>
                     <th><button class="btn btn-danger" (click)="eliminarCliente(cliente)">Borrar</button></th>
                 </tr>

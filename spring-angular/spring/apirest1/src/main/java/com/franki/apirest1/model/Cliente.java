@@ -5,9 +5,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -17,6 +20,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 //TODOS LOS CONSTRAIS SON DEL PAQUETE CONSTRAINS PARA PODER ENVIAR MENSAJES DE VALIDACION
@@ -44,6 +49,12 @@ public class Cliente implements Serializable{
 	private Date createAt;
 	
 	private String imagen;
+	
+	@NotNull(message = "La region no puede ser vacia")
+	@ManyToOne(fetch = FetchType.LAZY)//LAZY inidica que se traiga ese atributo hasta que se llame el metodo getRegion, sin embargo al hacer Listar cliente p.e las regiones no se cargaran
+	@JoinColumn(name = "region_id")//Anotacion que dice como se va  llamar el campo forein key, si no se pone por defecto pone NombreAtribito_NombreIdTipoDelAtributo 
+	@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})//Lazy al obetener la regio lo hace mediante un objeto region que funciona como "proxy" y tiene dos atributos mas, esta anotacion indicamos que no queremos ponere estos atributos en el Json
+	private Region region;
 	
 	
 
@@ -87,6 +98,15 @@ public class Cliente implements Serializable{
 	
 	public String getImagen() {
 		return imagen;
+	}
+	
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
 	}
 
 	public void setImagen(String imagen) {

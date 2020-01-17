@@ -1,24 +1,18 @@
 package com.franki.apirest1.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,18 +36,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.franki.apirest1.model.Cliente;
+import com.franki.apirest1.model.Region;
 import com.franki.apirest1.repo.ClienteRep;
+import com.franki.apirest1.service.IUploadService;
 
 @CrossOrigin(origins = { "http://localhost:4200" })
 @RestController
 @RequestMapping("/api")
 public class ClienteRestController {
-	
-	private static final Logger log = LoggerFactory.getLogger(ClienteRestController.class);
-
 
 	@Autowired
 	ClienteRep _cliente;
+
+	@Autowired
+	IUploadService _upload;
 
 	@GetMapping("/clientes")
 	public List<Cliente> getClientes() {
@@ -118,18 +114,11 @@ public class ClienteRestController {
 		Map<String, Object> respuesta = new HashMap<>();
 		Cliente cliente = _cliente.findById(id).orElse(null);
 
+		String nombreArchivo = null;
+
 		if (!archivo.isEmpty()) {
-
-			/* Nombre random sin espacios en blanco */
-
-			String nombreArchivo = UUID.randomUUID().toString() + '-' + archivo.getOriginalFilename().replace(" ", "");
-			Path ruta = Paths.get("/Users/francisco/Documents/cursos-de-udemy/spring-angular/spring/files")
-					.resolve(nombreArchivo).toAbsolutePath();
-			
-			/* Hacer log de la ruta */
-			log.info(ruta.toString());
 			try {
-				Files.copy(archivo.getInputStream(), ruta);
+				nombreArchivo = _upload.guardarArchivo(archivo);
 			} catch (IOException e) {
 				respuesta.put("mensaje", "No se pudo subir la imagen");
 				respuesta.put("error", e.getMessage().concat(e.getCause().getMessage()));
@@ -139,16 +128,7 @@ public class ClienteRestController {
 
 			String imagenAnterior = cliente.getImagen();
 
-			if (imagenAnterior != null && imagenAnterior.length() > 0) {
-				Path rutaimagenAnterior = Paths
-						.get("/Users/francisco/Documents/cursos-de-udemy/spring-angular/spring/files")
-						.resolve(imagenAnterior).toAbsolutePath();
-				File archivoimagenAnterior = rutaimagenAnterior.toFile();
-				if (archivoimagenAnterior.exists() && archivoimagenAnterior.canRead()) {
-					archivoimagenAnterior.delete();
-				}
-			}
-			
+			_upload.eliminarArchivo(imagenAnterior);
 
 			cliente.setImagen(nombreArchivo);
 			_cliente.save(cliente);
@@ -159,45 +139,31 @@ public class ClienteRestController {
 		return new ResponseEntity<Map<String, Object>>(respuesta, HttpStatus.CREATED);
 
 	}
-	
-	
-	
-	/*
-	 * Metodo para descargar una imagen Path
-	 * nombreImagen nombreImagen:.+ siento esto una expresion regular diciendo que va el parametro, un punto y algo mas p.e png
-	 */	
-	
-	@GetMapping("/clientes/upload/img/{nombreImagen:.+}")
-	public ResponseEntity<Resource> descarga(@PathVariable String nombreImagen){
-		
-		
-		Path rutaImagen = Paths
-				.get("/Users/francisco/Documents/cursos-de-udemy/spring-angular/spring/files")
-				.resolve(nombreImagen).toAbsolutePath();
-		
-		log.info(rutaImagen.toString());
 
-		Resource recurso=null;
+	/*
+	 * Metodo para descargar una imagen Path nombreImagen nombreImagen:.+ siento
+	 * esto una expresion regular diciendo que va el parametro, un punto y algo mas
+	 * p.e png
+	 */
+
+	@GetMapping("/clientes/upload/img/{nombreImagen:.+}")
+	public ResponseEntity<Resource> descarga(@PathVariable String nombreImagen) {
+
+		Resource recurso = null;
 		try {
-			recurso = new UrlResource(rutaImagen.toUri());
+			recurso = _upload.cargarArchivo(nombreImagen);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if (!recurso.exists() && !recurso.isReadable()) {
-			throw new RuntimeException("No se pudo cargar la imagen"+nombreImagen);
-		}
-		
+
 		HttpHeaders cabecera = new HttpHeaders();
-		
+
 		/*
 		 * En la cabecera forzamos la descarga
-		 */		
-		cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename =\""+recurso.getFilename()+"\"");
-		
-		
-		return new ResponseEntity<Resource>(recurso,cabecera, HttpStatus.OK);
+		 */
+
+		cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename =\"" + recurso.getFilename() + "\"");
+		return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
 
 	}
 
@@ -227,6 +193,8 @@ public class ClienteRestController {
 		actual.setApellido(cliente.getApellido());
 		actual.setNombre(cliente.getNombre());
 		actual.setEmail(cliente.getEmail());
+		actual.setRegion(cliente.getRegion());
+
 		try {
 			actual = _cliente.save(actual);
 			;
@@ -244,35 +212,34 @@ public class ClienteRestController {
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	public ResponseEntity<?> borrarCliente(@PathVariable Long id) {
 		Map<String, Object> respuesta = new HashMap<>();
-		Cliente cliente=null; 
-		
+		Cliente cliente = null;
+
 		/* Borra la foto */
 		try {
-			
-		cliente = _cliente.findById(id).orElse(null);
 
-		/* Borra cliente */	
+			cliente = _cliente.findById(id).orElse(null);
+
+			/* Borra cliente */
 			_cliente.deleteById(id);
 		} catch (DataAccessException e) {
 			respuesta.put("mensaje", "No se pudo eliminar el cliente");
 			respuesta.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String, Object>>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		
+
 		String imagenAnterior = cliente.getImagen();
-		if (imagenAnterior != null && imagenAnterior.length()>0) {
-			Path rutaimagenAnterior = Paths.get("/Users/francisco/Documents/cursos-de-udemy/spring-angular/spring/files")
-					.resolve(imagenAnterior).toAbsolutePath();
-			File archivoimagenAnterior= rutaimagenAnterior.toFile();
-			if (archivoimagenAnterior.exists() && archivoimagenAnterior.canRead()) {
-				archivoimagenAnterior.delete();
-			}
-		}
-		
+		_upload.eliminarArchivo(imagenAnterior);
+
 		respuesta.put("mensaje", "Cliente eliminado exitosamente");
 		return new ResponseEntity<Map<String, Object>>(respuesta, HttpStatus.OK);
 
+	}
+	
+	
+	
+	@GetMapping("/clientes/regiones")
+	public List<Region> getRegiones(){
+		return _cliente.findAllRegiones();
 	}
 
 }

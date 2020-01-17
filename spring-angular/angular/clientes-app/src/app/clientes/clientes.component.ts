@@ -3,8 +3,9 @@ import { ClienteService } from './cliente.service';
 import { Cliente } from './cliente';
 import swal from 'sweetalert2'
 import { tap } from 'rxjs/operators';
-import { CLIENTES } from './clientes.json';
+// import { CLIENTES } from './clientes.json';
 import { ActivatedRoute } from '@angular/router';
+import { ModalService } from './detalle/modal.service';
 
 
 @Component({
@@ -16,6 +17,7 @@ export class ClientesComponent implements OnInit {
 
   clientes: Cliente[];
   paginador:any;
+  clienteSeleccionado:Cliente;
 
 
   //============EQUIVALENTE DE INYECTAR UN SERVIOCIO============
@@ -26,7 +28,8 @@ export class ClientesComponent implements OnInit {
 
   constructor(
     private clienteService: ClienteService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private modalService:ModalService
   ) {}
 
 
@@ -52,7 +55,26 @@ export class ClientesComponent implements OnInit {
           this.paginador= resp;
         })
       ).subscribe();
-    })
+    });
+
+
+  
+    this.clienteService._notificarUpload.subscribe(cliente=>{
+      this.clientes=this.clientes.map(clienteItera=>{
+        if (clienteItera.id===cliente.id) {
+          clienteItera.imagen=cliente.imagen;
+        }
+        return clienteItera;
+      });
+    });
+  
+  }
+
+
+
+  disparaModal(cliente:Cliente){
+    this.clienteSeleccionado=cliente;
+    this.modalService.abrirModal(); 
   }
 
 
