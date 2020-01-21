@@ -1,0 +1,8 @@
+-> Creacion de usuarioService que implementa userDetails
+-> Creacion de la clase de configuracion SpringSecurityConfig  qu extiende WebSecurityConfigurerAdapter  
+-> Soberscritura del metodo configure del WebSecurityConfigurerAdapter
+-> registro de usuarioService en el AuthenticationManagerBuilder
+-> registro de passwordEncoder en el AuthenticationManagerBuilder
+-> Creacion de la clase de AuthorizationServerConfig que extienede de AuthorizationServerConfigurerAdapter
+-> Configuracion de endpoits mediante sobrescritura de metodo configure(AuthorizationServerEndpointsConfigurer endpoints),
+->registro (authenticationManager,tokenStore, accessTokenConverter)
