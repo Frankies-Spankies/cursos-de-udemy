@@ -1,5 +1,7 @@
 package com.franki.apirest1.auth;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +13,30 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
+/*Estos son tipos Abstractos los que se ocupan son los de JWT
+ * import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+ * import org.springframework.security.oauth2.provider.token.TokenStore;
+*/
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+import antlr.LLkAnalyzer;
+
+
+/*
+ * Clase para configurar el endpoint encagado de la seguridad de la aplicacion, i.e el que da los acceso a los clienten que hacen 
+ * login para obtener un token
+*/
+
 
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+	
+	@Autowired
+	InfoAdicionalToken infoAdicionalToken;
 
 	
 	/*
@@ -45,23 +63,36 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 
-		super.configure(security);
+		security.tokenKeyAccess("permitAll()").//Que usuarios pueden PEDIR token mediante el login o enviar sus credenciales 
+		checkTokenAccess("isAuthenticated()"); //QUienes puede pedir que se verifique el token para acceder a un recurso no Publico
 	}
 
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 
-		super.configure(clients);
+		clients.inMemory().withClient("angularapp").//Indicamos que clientes("Aplicaciones") pueden ingresar al api, ademas de que indicamos donde se van a guardar
+		secret(passwordEncoder.encode("12345") ).//Damos una contraseña al clientes
+		scopes("read","write").//Asigna permisos
+		authorizedGrantTypes("password", "refresh_token").//tipo de authenticacion en este caso login, tambien puede ser por codigo de auntentificacion, refresh_token renueva el token cuando va a caducar el token, apara que no se tenga que hacer login de nuevo
+		accessTokenValiditySeconds(3600).//tiempo en que caduca el token
+		refreshTokenValiditySeconds(3600);//cada cuando se refresca el token
 	}
 
 
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		/*
+		 * Instancia que une en una cadena el token con la informacion de auntificacion,
+		 * con la informacion adicional
+		 */
+		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(infoAdicionalToken,accessTokenConverter()));
 		
 		endpoints.authenticationManager(authenticationManager).
 		tokenStore(tokenStore()). //Componente que persites el token con ayuda del accessTokenConverter
 		accessTokenConverter(accessTokenConverter()).//componente que Traduce (en ambos sentidoa Decodifica<->Codifica) el JWT para que Oauth2 realice el proceso de auntheticacion, 
+		tokenEnhancer(tokenEnhancerChain);//Se añade la cadena
 		
 	}
 
@@ -80,6 +111,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		jwtAccessTokenConverter.setSigningKey(JwtConfig.RSA_PRIVADA);
+		jwtAccessTokenConverter.setVerifierKey(JwtConfig.RSA_PUBLICA);
+
 		return jwtAccessTokenConverter;
 	} 
 	

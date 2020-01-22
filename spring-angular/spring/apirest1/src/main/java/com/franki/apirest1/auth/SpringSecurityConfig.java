@@ -5,12 +5,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.franki.apirest1.service.UsuarioService;
 
+/*
+ * Clase encargada de la configuracion basica de Spring security, 
+ * se configura el Password encoder 
+ * y el servicio que que ocupara  para verfiicar que los usuarios estan registrados en BD (UserDetailsService)
+*/
+
+@EnableGlobalMethodSecurity(securedEnabled=true) //Permite agregar los reles requeridos en los metodos con la notacion @Secured
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -48,6 +57,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
+	}
+	
+	@Override
+	public void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().
+		anyRequest().authenticated().
+		and().//and regresa a la configuracion de Spring security
+		csrf().disable().//Cross-site request forgery  -- Cuando se trabaja con un monolito y se quiere evitar que otro cliente fuera de este haga peticiones
+		sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//El manejo de sesion tal como los datos del usuario se guardan en los tokens por lo que ya no se nesesaria la sesion
+		
 	}
 	
 	

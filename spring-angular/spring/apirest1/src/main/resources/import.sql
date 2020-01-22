@@ -18,8 +18,17 @@ INSERT into cliente (region_id, nombre, apellido, email, create_at) values (8,'F
 INSERT into cliente (region_id, nombre, apellido, email, create_at) values (1,'FRANKI9', 'MCSPANKI', 'franki9@google.com','2020-01-08');
 INSERT into cliente (region_id, nombre, apellido, email, create_at) values (2,'FRANKI10', 'MCSPANKI', 'franki10@google.com','2020-01-08');
 
-            
-                                                               
+
+INSERT into usuarios (username,password, enabled, nombre, email, apellido) values ('frank','$2a$10$X0OekXtlzD7pxFqE1pkl2e18DTVkOt5LuyLtYFxZLCrcua9tKTmai',1, 'frank', 'Franki@MacsPanki.com','McsPanki'); 
+INSERT into usuarios (username,password, enabled, nombre, email, apellido) values ('admin','$2a$10$gmZMgI4nDT8uy1zAcvoDSOSaufL98YetogwqLldJ7vzv5XAWNQxmW',1, 'spanki', 'spanki@MacsPanki.com','McsPanki'); 
+
+
+INSERT into roles (nombre) values ('ROLE_USER'); 
+INSERT into roles (nombre) values ('ROLE_ADMIN')
+
+INSERT into usuarios_roles (usuario_id,role_id) values (1,1); 
+INSERT into usuarios_roles (usuario_id,role_id) values (2,2); 
+INSERT into usuarios_roles (usuario_id,role_id) values (2,1);                                                              
 
 
 

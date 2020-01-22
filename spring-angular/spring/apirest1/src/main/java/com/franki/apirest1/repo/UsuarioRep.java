@@ -5,7 +5,10 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.franki.apirest1.model.Usuario;
 
-
+/*
+ * Al usar un instancia de UsuarioRep, esta por defecto va a trabajar de manera "Transaccional", 
+ * pero en buan parctica que todos los servicions DAO implenten la notacion @Transactional para evitar conflictos de acceso
+*/
 
 public interface UsuarioRep extends CrudRepository<Usuario, Long> {
 	

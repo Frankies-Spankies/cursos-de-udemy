@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -62,6 +63,7 @@ public class ClienteRestController {
 		return _cliente.findAll(pagina);
 	}
 
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@GetMapping("/clientes/{id}")
 	public ResponseEntity<?> getCliente(@PathVariable Long id) {
 		Cliente cliente = _cliente.findById(id).orElse(null);
@@ -78,7 +80,7 @@ public class ClienteRestController {
 	 * FORMULARIO (FORM DATA) FUNCIONA UNICAMNETE CON JSON QUE TIENEN LOS MISMO
 	 * RTTRIBUTOS AL OBJETO QUE SE TRATA DE PARSEAR
 	 */
-
+	@Secured("ROLE_ADMIN")
 	@PostMapping("/clientes")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente, BindingResult errores) {
@@ -108,6 +110,7 @@ public class ClienteRestController {
 	 * REQUEST PARAM SOPORTA EL LOS DATOS ENVIADOS DIRECTAMENTE ENVIADOS POR UN
 	 * FORMULARIO (FORM DATA)
 	 */
+	@Secured({"ROLE_ADMIN","ROLE_USER"})
 	@PostMapping("/clientes/upload")
 	public ResponseEntity<?> subirArchivo(@RequestParam(name = "archivo") MultipartFile archivo,
 			@RequestParam(name = "id") Long id) {
@@ -170,6 +173,7 @@ public class ClienteRestController {
 	// ==================
 	// Es importante que los errores vallan antes del id en los parametros!!!!!!!!!!
 	// ==================
+	@Secured("ROLE_ADMIN")
 	@PutMapping("/clientes/{id}")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public ResponseEntity<?> actualizaCliente(@Valid @RequestBody Cliente cliente, BindingResult errores,
@@ -207,7 +211,7 @@ public class ClienteRestController {
 		respuesta.put("cliente", actual);
 		return new ResponseEntity<Map<String, Object>>(respuesta, HttpStatus.OK);
 	}
-
+	@Secured("ROLE_ADMIN")
 	@DeleteMapping("/clientes/{id}")
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	public ResponseEntity<?> borrarCliente(@PathVariable Long id) {
