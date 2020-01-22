@@ -3,6 +3,28 @@
 -> Soberscritura del metodo configure del WebSecurityConfigurerAdapter
 -> registro de usuarioService en el AuthenticationManagerBuilder
 -> registro de passwordEncoder en el AuthenticationManagerBuilder
--> Creacion de la clase de AuthorizationServerConfig que extienede de AuthorizationServerConfigurerAdapter
+-> Creacion de la clase de AuthorizationServerConfig que extienede de AuthorizationServerConfigurerAdapter para configurar el servidor de Autentificacion
 -> Configuracion de endpoits mediante sobrescritura de metodo configure(AuthorizationServerEndpointsConfigurer endpoints),
 ->registro (authenticationManager,tokenStore, accessTokenConverter)
+
+
+->Configuracion del ClientDetailsServiceConfigurer en el metodo public void configure(ClientDetailsServiceConfigurer clients) 
+-> registro de Clientes (Aplicaciones p.e Angular Android) que puede ingresar 
+-> indica en donde se van a guardar los clientes
+-> asignacion de contraseña a esos clientes
+-> asigna permisos
+-> Configura tiempo de caducidad del token y que se requiere un refresh token y cada cuando se va a refrescar el token
+
+->Configuracion de AuthorizationServerSecurityConfigurer security
+-> Asigna a quien puede pedir un token y quien puede verificar si su token es valido
+
+
+-> Creacion de clase ResouceServerConfig que extiende de ResourceServerConfigurerAdapter para configurar el servidor de Recursos  por parte de auth0
+-> Confuguracion de rutas publicas
+-> Creacion de configuracion de cors 
+-> Registra cors en la cogiguracion de seguridad
+-> creacion de configuracion de registro
+
+
+-> Desabilita csrf para permitir el acceso de otras aplicaciones al api en SpringSecurityConfig
+-> Permite la notacion @Secured en SpringSecurityConfig
