@@ -91,12 +91,30 @@ export class AuthService {
     return false;
   }
 
+  hasRole(role:string):boolean{
+    if (this.usuario.roles.includes(role)) {
+      return true;
+    }
+    return false;
+  }
+
   logout():void {
     this._usuario=null;
     this._token=null;
     //sessionStorage.clear();
     sessionStorage.removeItem('usuario');
     sessionStorage.removeItem('token');
+  }
+
+  isTokenExpirado():boolean{
+      let payload = this.obtenerDatosToken(this.token);
+      let now = new Date().getTime() / 1000;
+
+      if (payload.exp < now) {
+        return true;
+      }
+      return false;
+
   }
 
 

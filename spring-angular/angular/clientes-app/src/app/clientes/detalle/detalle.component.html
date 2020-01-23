@@ -28,7 +28,7 @@
   
                 </ul>
   
-                <div class="input-group">
+                <div *ngIf="authService.hasRole('ROLE_ADMIN')" class="input-group">
                   <div class="custom-file">
                     <input (change)="seleccionaArchivo($event)" type="file" class="custom-file-input"
                       id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">

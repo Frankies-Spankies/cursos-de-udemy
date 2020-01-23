@@ -6,6 +6,7 @@ import { tap } from 'rxjs/operators';
 // import { CLIENTES } from './clientes.json';
 import { ActivatedRoute } from '@angular/router';
 import { ModalService } from './detalle/modal.service';
+import { AuthService } from '../usuarios/auth.service';
 
 
 @Component({
@@ -29,7 +30,8 @@ export class ClientesComponent implements OnInit {
   constructor(
     private clienteService: ClienteService,
     private activatedRoute: ActivatedRoute,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private authService:AuthService
   ) { }
 
 

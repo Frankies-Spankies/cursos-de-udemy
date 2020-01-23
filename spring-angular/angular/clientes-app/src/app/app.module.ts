@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -19,6 +19,10 @@ import { MatMomentDateModule  } from '@angular/material-moment-adapter';
 import { DetalleComponent } from './clientes/detalle/detalle.component';
 import { ModalService } from './clientes/detalle/modal.service';
 import { LoginComponent } from './usuarios/login.component';
+import { AuthGuard } from './usuarios/guards/auth.guard';
+import { RoleGuard } from './usuarios/guards/role.guard';
+import { TokenInterceptor } from './usuarios/interceptors/token.interceptor';
+import { AuthInterceptor } from './usuarios/interceptors/auth.interceptor';
 
 
 registerLocaleData(localeES,'es');
@@ -29,8 +33,8 @@ const routes: Routes = [
   { path: 'directivas', component: ForComponentComponent },
   { path: 'clientes', component: ClientesComponent },
   { path: 'clientes/page/:page', component: ClientesComponent },
-  { path: 'clientes/form', component: FormComponent},
-  { path: 'clientes/form/:id', component: FormComponent},
+  { path: 'clientes/form', component: FormComponent, canActivate:[AuthGuard,RoleGuard], data:{role:'ROLE_ADMIN'}},//parametro deta
+  { path: 'clientes/form/:id', component: FormComponent, canActivate:[AuthGuard,RoleGuard], data:{role:'ROLE_ADMIN'}},
   { path: 'login', component: LoginComponent},
 ];
 
@@ -57,7 +61,9 @@ const routes: Routes = [
   providers: [
     ClienteService,
     {provide: LOCALE_ID, useValue: 'es'},
-    ModalService
+    ModalService,
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
 
   ],
   bootstrap: [AppComponent]

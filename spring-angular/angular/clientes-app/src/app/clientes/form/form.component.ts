@@ -38,6 +38,7 @@ export class FormComponent implements OnInit {
       },
       error => {
         this.errores = error.error;
+        
         console.log(error.error);
       });
   }
