@@ -240,7 +240,7 @@ public class ClienteRestController {
 	}
 	
 	
-	
+	@Secured("ROLE_ADMIN")
 	@GetMapping("/clientes/regiones")
 	public List<Region> getRegiones(){
 		return _cliente.findAllRegiones();

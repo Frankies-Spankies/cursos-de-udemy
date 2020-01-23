@@ -42,14 +42,13 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter{
 	 * CORS Cross Origin Resource Permite que se realizen peticiones dentro de otro
 	 * dominio que no se encuentren donde esta corriendo la aplicacion de spring
 	 */
-	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-		config.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));//Algunos navegadores al enviar el request del login para solicitar un token lo hacen por OPTIONS
+		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));//Algunos navegadores al enviar el request del login para solicitar un token lo hacen por OPTIONS
 		config.setAllowCredentials(true);
-		config.setExposedHeaders(Arrays.asList("Content-Type","Authorization"));
+		config.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
 		
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
@@ -69,6 +68,11 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter{
 		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		return bean;
 	}
+
+	
+
+	
+
 
 	
 }

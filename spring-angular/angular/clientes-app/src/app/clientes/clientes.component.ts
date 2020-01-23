@@ -16,8 +16,8 @@ import { ModalService } from './detalle/modal.service';
 export class ClientesComponent implements OnInit {
 
   clientes: Cliente[];
-  paginador:any;
-  clienteSeleccionado:Cliente;
+  paginador: any;
+  clienteSeleccionado: Cliente;
 
 
   //============EQUIVALENTE DE INYECTAR UN SERVIOCIO============
@@ -29,8 +29,8 @@ export class ClientesComponent implements OnInit {
   constructor(
     private clienteService: ClienteService,
     private activatedRoute: ActivatedRoute,
-    private modalService:ModalService
-  ) {}
+    private modalService: ModalService
+  ) { }
 
 
   //==========================
@@ -43,38 +43,38 @@ export class ClientesComponent implements OnInit {
   //==========================
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(params=>{
+    this.activatedRoute.params.subscribe(params => {
       //El operador suma caste un String a Number
-      let page:number=params['page'];
+      let page: number = params['page'];
       if (!page) {
         page = 0;
       }
       this.clienteService.getClientes(page).pipe(
         tap((resp: any) => {
           this.clientes = resp.content;
-          this.paginador= resp;
+          this.paginador = resp;
         })
       ).subscribe();
     });
 
 
-  
-    this.clienteService._notificarUpload.subscribe(cliente=>{
-      this.clientes=this.clientes.map(clienteItera=>{
-        if (clienteItera.id===cliente.id) {
-          clienteItera.imagen=cliente.imagen;
+
+    this.clienteService._notificarUpload.subscribe(cliente => {
+      this.clientes = this.clientes.map(clienteItera => {
+        if (clienteItera.id === cliente.id) {
+          clienteItera.imagen = cliente.imagen;
         }
         return clienteItera;
       });
     });
-  
+
   }
 
 
 
-  disparaModal(cliente:Cliente){
-    this.clienteSeleccionado=cliente;
-    this.modalService.abrirModal(); 
+  disparaModal(cliente: Cliente) {
+    this.clienteSeleccionado = cliente;
+    this.modalService.abrirModal();
   }
 
 
@@ -97,14 +97,23 @@ export class ClientesComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.value) {
-        this.clienteService.borrarCliente(cliente.id).subscribe(resp => {
-          this.clientes = this.clientes.filter(cli => cli != cliente);
-        });
-        swalWithBootstrapButtons.fire(
-          '¿Eliminado!',
-          'Cliente eliminado con exito.',
-          'success'
-        )
+        this.clienteService.borrarCliente(cliente.id).subscribe(
+          resp => {
+            this.clientes = this.clientes.filter(cli => cli != cliente);
+            swalWithBootstrapButtons.fire(
+              '¿Eliminado!',
+              'Cliente eliminado con exito.',
+              'success'
+            );
+          },
+          err=>{
+            swalWithBootstrapButtons.fire(
+              'Error',
+              'Error al eliminar el cliente',
+              'error'
+            );
+          }
+          );
       }
     })
   }
