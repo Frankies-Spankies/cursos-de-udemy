@@ -1,5 +1,4 @@
-package com.franki.apirest1.model;
-
+package com.franki.apirest2.model;
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,6 +27,8 @@ Tambie permie almacenar el objeto en una sesion http
 @Table(name = "usuarios")
 public class Usuario implements Serializable {
 
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -40,10 +41,6 @@ public class Usuario implements Serializable {
 
 	private Boolean enabled;
 	
-	private String nombre;
-	@Column(unique = true)
-	private String email;
-	private String apellido;
 
 	/*
 	 * Indicamos toda la configuracion de la realcion Usuarios Roles en esta clase
@@ -104,36 +101,11 @@ public class Usuario implements Serializable {
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
-
 	
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getApellido() {
-		return apellido;
-	}
-
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
-	}
-
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
 
 }

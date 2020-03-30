@@ -1,5 +1,4 @@
- package com.franki.apirest1.model;
-
+package com.franki.apirest2.model;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,6 +13,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "roles")
 public class Role implements Serializable {
+
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +45,11 @@ public class Role implements Serializable {
 		this.nombre = nombre;
 	}
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 
 	/* De Igual forma los Getters y Setters
 	 * public List<Usuario> getUsuarios() { return usuarios; }
@@ -53,9 +59,6 @@ public class Role implements Serializable {
 
 
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 }
