@@ -5,13 +5,12 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class UsuarioService {
-
+export class AdminService {
   constructor(private http:HttpClient) { }
   private url: string = 'http://localhost:8080/api/';
 
 
-  uinicio():Observable<any>{
-    return this.http.get<any>(this.url+'uinicio');
+  ainicio():Observable<any>{
+    return this.http.get<any>(this.url+'ainicio');
   }
 }

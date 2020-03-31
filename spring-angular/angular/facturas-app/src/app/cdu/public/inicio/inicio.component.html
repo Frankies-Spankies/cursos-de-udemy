@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-body">
+        <div class="col-8">
+            <a href="" [routerLink]="['/uinicio']" class="btn btn-primary"> Prueba Inicio Usuario</a>
+        </div>
+        <div class="col-8">  
+            <a href="" [routerLink]="['/ainicio']" class="btn btn-info"> Prueba Inicio Administrador</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p *ngIf="mensaje">Peticion al servidor: {{mensaje}} </p>
+    </div>
+</div>
