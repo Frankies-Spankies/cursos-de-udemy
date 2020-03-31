@@ -1,4 +1,4 @@
-package com.franki.apirest2.model;
+package com.franki.apirest1.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

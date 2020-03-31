@@ -12,14 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.franki.apirest2.model.Cliente;
-import com.franki.apirest2.repository.ClienteRep;
+
 
 @RestController
 @RequestMapping("/api/")
-public class ClienteRestController {
-	@Autowired
-	ClienteRep _cliente;
+public class PruebaRestController {
+
 
 	@Secured("ROLE_USER")
 	@GetMapping("/uinicio")
